@@ -21,17 +21,17 @@ func New(src string, dst string) Unzip {
     }
 }
 
-func Extract(src string, dst string) ([]string, error) {
+func (u Unzip) Extract() ([]string, error) {
     var filenames []string
-    r, err := zip.OpenReader(src)
+    r, err := zip.OpenReader(u.Src)
     if err != nil {
         return nil, err
     }
     defer r.Close()
     for f := range r.File {
-        dstpath := filepath.Join(dst, r.File[f].Name)
-        if !strings.HasPrefix(dstpath, filepath.Clean(dst) + string(os.PathSeparator)) {
-            return nil, fmt.Errorf("%s: illegal file path", src)
+        dstpath := filepath.Join(u.Dst, r.File[f].Name)
+        if !strings.HasPrefix(dstpath, filepath.Clean(u.Dst) + string(os.PathSeparator)) {
+            return nil, fmt.Errorf("%s: illegal file path", u.Src)
         }
         if r.File[f].FileInfo().IsDir() {
             if err := os.MkdirAll(dstpath, os.ModePerm); err != nil {
